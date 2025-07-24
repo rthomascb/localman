@@ -1,0 +1,32 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: RegisterBuildArtifactKushal
+on:
+  workflow_dispatch:
+jobs:
+  buildArtRegTest:
+    outputs:
+        output1: ${{ steps.registerBuildArtifact.outputs.artifact-id  }}
+    steps:
+      - id: registerBuildArtifact
+        name: catalog action test
+        with:
+          version: "14.a9"
+          url: docker.io/myapp/kcpImg14:14.0.29
+          digest: d150
+          labels:  "lbl1"
+          name: kcpBuildRegister 142
+        uses: cloudbees-io/register-build-artifact@CBP-15450
+ #     - name: Artifact Id output
+ #       uses: docker://golang:1.20.3-alpine3.17
+ #       shell: sh
+ #       run: |
+ #         echo "Output param: ${{ steps.registerBuildArtifact.outputs.artifact-id }}"
+  artifactIdOutput:
+    steps:
+      - name: Print output param
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: |
+          echo "Output param: ${{ needs.buildArtRegTest.outputs.output1 }}"
+    needs: buildArtRegTest

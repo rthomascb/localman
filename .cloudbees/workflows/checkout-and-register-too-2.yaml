@@ -1,0 +1,39 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: Checkout and register too
+on:
+  workflow_dispatch:
+jobs:
+  checkout:
+    steps:
+      - name: Checkout
+        uses: cloudbees-io/checkout@v1
+        id: checkout
+        env:
+          RUNNER_DEBUG: "1"
+      - name: Debug
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: |
+          echo "Commit:"
+          echo Repository URL = ${{ steps.checkout.outputs.repository-url }}
+          echo Commit ID = ${{ steps.checkout.outputs.commit }}
+          echo Commit URL = ${{ steps.checkout.outputs.commit-url }}
+          echo Ref = ${{ steps.checkout.outputs.ref }}
+      - name: Register artifact version with commit details
+        uses: cloudbees-io/register-build-artifact@v1
+        with:
+          version: 1.0.1225
+          url: docker.io/myapp/myimg:1.0.0.5
+          name: rtFactRegister
+          commit: ${{ steps.checkout.outputs.commit }}
+          repository-url: ${{ steps.checkout.outputs.repository-url }}
+          commit-url: ${{ steps.checkout.outputs.commit-url }}
+          ref: ${{ steps.checkout.outputs.ref }}
+      - name: Register artifact version - default commit details from run
+        uses: cloudbees-io/register-build-artifact@v1
+        with:
+          version: 1.0.1228
+          url: docker.io/myapp/myimg:1.0.0.8
+          name: rtFactRegister    
+     

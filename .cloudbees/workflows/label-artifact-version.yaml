@@ -1,0 +1,14 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: LabelArtifactVersion
+on:
+  workflow_dispatch:
+jobs:
+  success_default_replace_labels_to_artifact_ver:
+    steps:
+      - name: success_default_replace_labels_to_artifact_ver
+        uses: cloudbees-io/label-artifact-version@CBP-12420
+        with:
+          component-id: 065b2595-cd1e-415d-9c5b-cab06074b641
+          artifact-id: f089759c-9a6c-4c5b-befb-d70ca006625c
+          labels: Default,     replace, operation , performed.

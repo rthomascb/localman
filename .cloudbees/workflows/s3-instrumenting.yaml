@@ -1,0 +1,31 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: S3 Instrumenting
+on:
+  workflow_dispatch:
+jobs:
+  upload-to-s3:
+    steps:
+      - uses: docker://golang:1.20.3-alpine3.17
+        name: Create File
+        shell: sh
+        run: |
+          mkdir ${{ cloudbees.workspace }}/hello
+          for i in file1.txt file2.txt file3.txt
+          do
+            echo "hello world" > ${{ cloudbees.workspace }}/hello/$i
+          done
+          ls ${{ cloudbees.workspace }}
+      - uses: cloudbees-io/configure-aws-credentials@v1
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.aws_access_key_id }}
+          aws-secret-access-key: ${{ secrets.aws_secret_access_key }}
+          aws-session-token: ${{ secrets.aws_session_token }}
+      - uses: cloudbees-io/s3-upload-object@v1
+        name: upload to s3
+        id: workspace-to-s3-upload
+        with:
+          file-path: ${{ cloudbees.workspace }}/hello
+          s3-path: hello
+          bucket-name: saas-file-upload-test

@@ -1,0 +1,26 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: Test Approval
+on:
+  workflow_dispatch:
+    inputs:
+      instructions:
+        type: string
+        default: If you get this notification, please forward to rthomas@cloudbees.com. Thanks!
+jobs:
+  build:
+    steps:
+      - uses: docker://golang:1.20.3-alpine3.17
+        name: Say hello
+        shell: sh
+        run: |
+          echo "hello world"
+    needs:
+      - Prebuild
+  Prebuild:
+    timeout-minutes: 4320
+    delegates: cloudbees-io/manual-approval/custom-job.yml@v1
+    with:
+      approvers: rthomas@cloudbees.com,cfulmer@cloudbees.com
+      disallowLaunchByUser: false
+      instructions: ${{ inputs.instructions }}

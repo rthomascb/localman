@@ -1,0 +1,32 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: Kaniko workflow
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    steps:
+      - name: Checkout
+        uses: cloudbees-io/checkout@v1
+      - name: Build
+        uses: docker://eclipse-temurin:21-alpine
+        shell: sh
+        run: |
+          ./gradlew clean build;
+      - id: dockerconfig
+        name: Configure container registry credentials
+        uses: cloudbees-io/configure-oci-credentials@v1
+        with:
+          registry: https://index.docker.io/v1/
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Build container image with Kaniko (Rich)
+        uses: cloudbees-io/kaniko@v1
+        id: kanikostep
+        with:
+          destination: docker.io/rthomascb/docker-demo:0.0.1-SNAPSHOT
+      - name: Display digest
+        uses: docker://eclipse-temurin:21-alpine
+        shell: sh
+        run: |
+          echo Digest= ${{ steps.kanikostep.outputs.digest }}

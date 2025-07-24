@@ -1,0 +1,14 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: Scheduled Workflow
+on:
+  schedule:
+    - cron: 0 0 * * 0
+jobs:
+  build:
+    steps:
+      - name: Run me every 5 minutes
+        uses: docker://golang:1.20.3-alpine3.17
+        shell: sh
+        run: |
+          echo "hello world every 5 minutes"

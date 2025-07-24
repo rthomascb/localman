@@ -1,0 +1,16 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: RegisterDeployedArtifact
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    steps:
+      - name: Deploy artifact
+        uses: cloudbees-io/register-deployed-artifact@4d17813a358909108138a35442ba5969222fa4f0
+        with:
+          name: rtFactRegister
+          version: 1.0.0
+          url: docker.io/myapp/myimg:1.0.0
+          digest: sha256:5e0687d9471728b0a200e0a3840fa16466150c58f628dc6e6c40a9b07e3b3609
+          target-environment: RTEnv
